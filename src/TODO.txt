@@ -1,0 +1,8 @@
+
+
+1. File ~ Settings ~ Build, Execution, Deployment ~ Deployment:
+    -- Set the SFTP Host (find IP address from brick and enter here)
+    -- Test SFTP Connection (use the button)
+         -- If asked about authenticity, respond Yes
+
+2.
