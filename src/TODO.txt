@@ -1,8 +1,38 @@
+1. With your instructor, modify the files per the Slide Presentation.
+
+2. As a team, with your instructor, alternating who types,
+   add a Snatch3rRobot class with methods:
+     -- __init__
+     -- go
+     -- stop
+     -- go_for_seconds
+
+3. As a team, with your instructor, alternating who types,
+   add a Snatch3rRobot class with methods:
+     --
+
+4. Individually, do one of the following:
+  -- In rosebotics.py:
+       -- Methods to make the robot go forwards and backwards
+            a given number of seconds.
+       -- Methods to make the robot spin left and spin right
+            a given number of degrees
+       -- Methods to make the robot turn left and turn right
+            a given number of degrees
+   -- In your   username.py   file:  testing code for a teammate's code.
 
 
-1. File ~ Settings ~ Build, Execution, Deployment ~ Deployment:
-    -- Set the SFTP Host (find IP address from brick and enter here)
-    -- Test SFTP Connection (use the button)
-         -- If asked about authenticity, respond Yes
+4. Individually, do one of the following:
+  -- In rosebotics.py:
+       -- Methods to make the robot go forwards and backwards
+            a given number of seconds.
+       -- Methods to make the robot spin left and spin right
+            a given number of degrees
+       -- Methods to make the robot turn left and turn right
+            a given number of degrees
+   -- In your   username.py   file:  testing code for a teammate's code.
 
-2.
+ 5. As time permits, individually do one of the following:
+   -- Same as previous item, but:
+        -- Do a different pair of actions, and make the robot go
+              for a given number of centimeters (forward/backward) or degrees.

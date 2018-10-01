@@ -1,5 +1,10 @@
-from ev3dev import ev3
+"""
+  Capstone Project.  Code shared by the team.
+  Team members:  PUT_YOUR_NAMES_HERE.
+  Fall term, 2018-2019.
+"""
 
+from ev3dev import ev3
 from enum import Enum
 
 
@@ -18,6 +23,9 @@ class Snatch3rRobot(object):
                  right_wheel_port=ev3.OUTPUT_C):
         self.left_wheel = Wheel(left_wheel_port)
         self.right_wheel = Wheel(right_wheel_port)
+
+        self.left_wheel.reset_degrees_spun()
+        self.right_wheel.reset_degrees_spun()
 
     def go(self,
            left_wheel_duty_cycle_percent=None,
@@ -81,3 +89,9 @@ class Wheel(object):
         if stop_action is None:
             stop_action = self.default_stop_action
         self.motor.stop(stop_action=stop_action)
+
+    def get_degrees_spun(self):
+        return self.motor.position
+
+    def reset_degrees_spun(self, position=0):
+        self.motor.position = position
