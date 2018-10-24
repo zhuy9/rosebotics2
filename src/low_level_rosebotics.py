@@ -6,7 +6,6 @@
 """
 
 from ev3dev import ev3
-import abc
 
 
 class Wheel(object):
@@ -31,6 +30,10 @@ class Wheel(object):
           :type  default_stop_action:         StopAction
         """
         self.motor = ev3.LargeMotor(port)
+        assert self.motor.connected,\
+            ("A wheel motor appears to not be connected.\n"
+             + "  Check the B and C jacks.  Are the plugs connected securely?")
+
         self.default_duty_cycle_percent = default_duty_cycle_percent
         self.default_stop_action = default_stop_action
         self.reset_degrees_spun()
@@ -76,6 +79,9 @@ class TouchSensor(object):
         """
         self.port = port
         self.sensor = ev3.TouchSensor(port)
+        assert self.sensor.connected,\
+            ("The touch sensor appears to not be connected.\n"
+             + "  Check the jack labelled 1.  Is the plug connected securely?")
 
     def get_value(self):
         """
@@ -124,6 +130,9 @@ class ColorSensor(object):
         """
         self.port = port
         self.sensor = ev3.ColorSensor(port)
+        assert self.sensor.connected,\
+            ("The color sensor appears to not be connected.\n"
+             + "  Check the jack labelled 3.  Is the plug connected securely?")
 
     def get_value(self):
         """
@@ -150,71 +159,70 @@ class ColorSensor(object):
         return self.sensor.reflected_light_intensity
 
 
-
-class InfraredForSensingProximity(ev3.InfraredSensor):
-    """
-    The physical Infrared Sensor can be used to measure proximity (distance)
-    to the nearest object in its range of vision.  In this mode,
-    the sensor emits infrared and measures properties of the reflected signal.
-    """
-
-    def __init__(self, port):
-        """
-        Constructs an InfraredSensor at the given port,
-        where  port  should be one of:
-          ev3.INPUT_1    ev3.INPUT_2    ev3.INPUT_3    ev3.INPUT_4
-        """
-        self.port = port
-        super().__init__(port)
-
-    def get_value(self):
-        """
-        Returns the distance to the nearest object detected, in inches.
-        """
-        return self.distance_inches
-
-    def get_distance_in_inches(self):
-        """
-        Returns the distance to the nearest object detected, in inches.
-        """
-        return self.sensor.distance_inches
-
-    def get_distance_in_centimeters(self):
-        """
-        Returns the distance to the nearest object detected, in centimeters.
-        """
-        return self.sensor.distance_centimeters
-
-    def is_other_sensor_present(self):
-        """
-        Returns True if another ultrasonic sensor could be heard nearby,
-        else returns False.
-        """
-        return self.sensor.other_sensor_present
-
-
-class InfraredForSensingBeacon(ev3.BeaconSeeker):
-    """
-    The physical Infrared Sensor can be used to measure distance and heading
-    to the nearest source of the signal emitted by the Remote Beacon.  In this
-    mode, the sensor measures properties of any infrared signal in its range.
-    """
-
-    def __init__(self, port):
-        """
-        Constructs an InfraredSensor at the given port,
-        where  port  should be one of:
-          ev3.INPUT_1    ev3.INPUT_2    ev3.INPUT_3    ev3.INPUT_4
-        """
-        self.port = port
-        super().__init__(port)
-
-    def get_value(self):
-        """
-        Returns the distance to the nearest object detected, in inches.
-        """
-        return self.sensor.distance_inches
-
+# class InfraredForSensingProximity(ev3.InfraredSensor):
+#     """
+#     The physical Infrared Sensor can be used to measure proximity (distance)
+#     to the nearest object in its range of vision.  In this mode,
+#     the sensor emits infrared and measures properties of the reflected signal.
+#     """
+#
+#     def __init__(self, port):
+#         """
+#         Constructs an InfraredSensor at the given port,
+#         where  port  should be one of:
+#           ev3.INPUT_1    ev3.INPUT_2    ev3.INPUT_3    ev3.INPUT_4
+#         """
+#         self.port = port
+#         super().__init__(port)
+#
+#     def get_value(self):
+#         """
+#         Returns the distance to the nearest object detected, in inches.
+#         """
+#         return self.distance_inches
+#
+#     def get_distance_in_inches(self):
+#         """
+#         Returns the distance to the nearest object detected, in inches.
+#         """
+#         return self.sensor.distance_inches
+#
+#     def get_distance_in_centimeters(self):
+#         """
+#         Returns the distance to the nearest object detected, in centimeters.
+#         """
+#         return self.sensor.distance_centimeters
+#
+#     def is_other_sensor_present(self):
+#         """
+#         Returns True if another ultrasonic sensor could be heard nearby,
+#         else returns False.
+#         """
+#         return self.sensor.other_sensor_present
+#
+#
+# class InfraredForSensingBeacon(ev3.BeaconSeeker):
+#     """
+#     The physical Infrared Sensor can be used to measure distance and heading
+#     to the nearest source of the signal emitted by the Remote Beacon.  In this
+#     mode, the sensor measures properties of any infrared signal in its range.
+#     """
+#
+#     def __init__(self, port):
+#         """
+#         Constructs an InfraredSensor at the given port,
+#         where  port  should be one of:
+#           ev3.INPUT_1    ev3.INPUT_2    ev3.INPUT_3    ev3.INPUT_4
+#         """
+#         self.port = port
+#         super().__init__(port)
+#
+#     def get_value(self):
+#         """
+#         Returns the distance to the nearest object detected, in inches.
+#         """
+#         return self.sensor.distance_inches
+#
 
 # class UltrasonicSensor(object):
 #     def __init__(self, port):
