@@ -67,62 +67,46 @@ class Wheel(object):
         self.motor.position = position
 
 
-class Sensor(object):
-    """ A Sensor has a PORT into which it is plugged and a GET_VALUE method. """
-
-    def __init__(self, port, sensor):
-        """
-        port must be one of:  ev3.INPUT_1  ev3.INPUT_2  ev3.INPUT_3  ev3.INPUT_4
-        sensor must be a ev3.TouchSensor or ...
-        """
-        self.port = port
-        self.sensor = sensor(port)
-
-    @abc.abstractmethod
-    def get_value(self):
-        """ Subclasses must implement this method. """
-
-
-class TouchSensor(Sensor):
+class TouchSensor(object):
     def __init__(self, port):
         """
         Constructs a TouchSensor at the given port,
         where  port  should be one of:
           ev3.INPUT_1    ev3.INPUT_2    ev3.INPUT_3    ev3.INPUT_4
         """
-        super().__init__(port, ev3.TouchSensor)
+        self.port = port
+        self.sensor = ev3.TouchSensor(port)
 
     def get_value(self):
         """
         Returns 1 if the TouchSensor is currently pressed,
                 0 if it is not currently pressed.
         """
-        return self.sensor.is_pressed()
+        return self.sensor.is_pressed
 
 
-class Camera(Sensor):
-    """
-    XXX
-    """
+# class Camera(Sensor):
+#     """
+#     XXX
+#     """
+#
+#     def __init__(self, port=ev3.INPUT_2):
+#         """
+#         Constructs a Camera at the given port, where  port  should be one of:
+#           ev3.INPUT_1    ev3.INPUT_2    ev3.INPUT_3    ev3.INPUT_4
+#         """
+#         super().__init__(port, Sensor)
+#
+#     def get_value(self):
+#         """
+#         Returns a 3-tuple (R, G, B) where
+#           - R/G/B is the amount of Red/Green/Blue light reflected, respectively,
+#           - each number is in the range from 0 (none reflected) to 1020.
+#         """
+#         return self.sensor.raw()
 
-    def __init__(self, port=ev3.INPUT_2):
-        """
-        Constructs a Camera at the given port, where  port  should be one of:
-          ev3.INPUT_1    ev3.INPUT_2    ev3.INPUT_3    ev3.INPUT_4
-        """
-        super().__init__(port, Sensor)
 
-    def get_value(self):
-        """
-        Returns a 3-tuple (R, G, B) where
-          - R/G/B is the amount of Red/Green/Blue light reflected, respectively,
-          - each number is in the range from 0 (none reflected) to 1020.
-        """
-        return self.sensor.raw()
-
-
-
-class ColorSensor(Sensor):
+class ColorSensor(object):
     """
     A ColorSensor sends red, then green, then blue light, rotating very quickly
     through all three, and measures the amount of light reflected.
@@ -138,7 +122,8 @@ class ColorSensor(Sensor):
         where  port  should be one of:
           ev3.INPUT_1    ev3.INPUT_2    ev3.INPUT_3    ev3.INPUT_4
         """
-        super().__init__(port, ev3.ColorSensor)
+        self.port = port
+        self.sensor = ev3.ColorSensor(port)
 
     def get_value(self):
         """
@@ -146,7 +131,7 @@ class ColorSensor(Sensor):
           - R/G/B is the amount of Red/Green/Blue light reflected, respectively,
           - each number is in the range from 0 (none reflected) to 1020.
         """
-        return self.sensor.raw()
+        return self.sensor.raw
 
     def get_color(self):
         """
@@ -165,22 +150,8 @@ class ColorSensor(Sensor):
         return self.sensor.reflected_light_intensity
 
 
-class InfraredSensor(Sensor):
 
-    def __init__(self, port=ev3.INPUT_4):
-        """
-        Constructs an InfraredSensor at the given port,
-        where  port  should be one of:
-          ev3.INPUT_1    ev3.INPUT_2    ev3.INPUT_3    ev3.INPUT_4
-        """
-        super().__init__(port, ev3.InfraredSensor)
-
-    @abc.abstractmethod
-    def get_value(self):
-        """ Not implemented.  Instead, use the mode-specific methods. """
-
-
-class InfraredForSensingProximity(InfraredSensor):
+class InfraredForSensingProximity(ev3.InfraredSensor):
     """
     The physical Infrared Sensor can be used to measure proximity (distance)
     to the nearest object in its range of vision.  In this mode,
@@ -193,13 +164,14 @@ class InfraredForSensingProximity(InfraredSensor):
         where  port  should be one of:
           ev3.INPUT_1    ev3.INPUT_2    ev3.INPUT_3    ev3.INPUT_4
         """
-        super().__init__(port, ev3.InfraredSensor)
+        self.port = port
+        super().__init__(port)
 
     def get_value(self):
         """
         Returns the distance to the nearest object detected, in inches.
         """
-        return self.sensor.distance_inches
+        return self.distance_inches
 
     def get_distance_in_inches(self):
         """
@@ -221,7 +193,7 @@ class InfraredForSensingProximity(InfraredSensor):
         return self.sensor.other_sensor_present
 
 
-class InfraredForSensingBeacon(Sensor):
+class InfraredForSensingBeacon(ev3.BeaconSeeker):
     """
     The physical Infrared Sensor can be used to measure distance and heading
     to the nearest source of the signal emitted by the Remote Beacon.  In this
@@ -234,8 +206,8 @@ class InfraredForSensingBeacon(Sensor):
         where  port  should be one of:
           ev3.INPUT_1    ev3.INPUT_2    ev3.INPUT_3    ev3.INPUT_4
         """
+        self.port = port
         super().__init__(port)
-        self.sensor = ev3.InfraredSensor(port)
 
     def get_value(self):
         """

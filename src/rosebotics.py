@@ -47,7 +47,7 @@ class Snatch3rRobot(object):
         # self.arm = ArmAndClaw(arm_port)
         self.touch_sensor = TouchSensor(touch_sensor_port)
         # self.camera = Camera(camera_port)
-        # self.color_sensor = ColorSensor(color_sensor_port)
+        self.color_sensor = ColorSensor(color_sensor_port)
         # self.infrared_sensor = InfraredSensor(infrared_sensor_port)
 
 
@@ -228,9 +228,6 @@ class ColorSensor(rb.ColorSensor):
         Each item in the sequence must be a Color (as defined above).
         """
         # TODO.
-
-class InfraredSensor(rb.InfraredSensor):
-    pass
 
 
 class InfraredSensorAsProximitySensor(object):
