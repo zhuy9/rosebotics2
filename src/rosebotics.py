@@ -11,7 +11,7 @@ from ev3dev import ev3
 from enum import Enum
 import low_level_rosebotics as rb
 import time
-
+from math import *
 
 class StopAction(Enum):
     COAST = 'coast'
@@ -104,22 +104,17 @@ class DriveSystem(object):
         Go straight at the given speed (-100 to 100, negative is backwards)
         for the given number of inches, stopping with the given StopAction.
         """
-        # TODO: Do a few experiments to determine the constant that converts
-        # TODO:   from wheel-degrees-spun to robot-inches-moved.
-        # TODO:   Assume that the conversion is linear with respect to speed.
-        # self.
+        # DONE: Do a few experiments to determine the constant that converts
+        # DONE:   from wheel-degrees-spun to robot-inches-moved.
+        # DONE:   Assume that the conversion is linear with respect to speed.
         self.start_moving(duty_cycle_percent,
                           duty_cycle_percent)
-        start_right = self.drive_system.right_wheel.get_degrees_spun()
-        start_left = self.drive_system.right_wheel.get_degrees_spun()
-        print("Left/right wheel initial positions:",start_left, start_right)
-        current_right = self.drive_system.right_wheel.get_degrees_spun()
-        current_left = self.drive_system.left_wheel.get_degrees_spun()
         while True:
-            if current_left >= current_left + 20000 * inches:
+            if self.left_wheel.get_degrees_spun() >= 86 * inches:
                 self.stop_moving(stop_action)
+                self.left_wheel.reset_degrees_spun()
+                self.right_wheel.reset_degrees_spun()
                 break
-        print("Left/right wheel end positions:", current_left, current_right)
 
     def spin_in_place_degrees(self,
                               degrees,
@@ -131,21 +126,18 @@ class DriveSystem(object):
         where positive is clockwise and negative is counter-clockwise),
         stopping by using the given StopAction.
         """
-        # TODO: Do a few experiments to determine the constant that converts
-        # TODO:   from wheel-degrees-spun to robot-degrees-spun.
-        # TODO:   Assume that the conversion is linear with respect to speed.
+        # DONE: Do a few experiments to determine the constant that converts
+        # DONE:   from wheel-degrees-spun to robot-degrees-spun.
+        # DONE:   Assume that the conversion is linear with respect to speed.
         self.start_moving(duty_cycle_percent,
-                          duty_cycle_percent*(-1))
-        start_right = self.drive_system.right_wheel.get_degrees_spun()
-        start_left = self.drive_system.right_wheel.get_degrees_spun()
-        print("Left/right wheel initial positions:", start_left, start_right)
-        current_right = self.drive_system.right_wheel.get_degrees_spun()
-        current_left = self.drive_system.left_wheel.get_degrees_spun()
+                          -duty_cycle_percent)
         while True:
-            if current_left >= current_left + 1 * degrees:
+            if fabs(self.left_wheel.get_degrees_spun()) >= 5.7 * degrees:
                 self.stop_moving(stop_action)
+                self.left_wheel.reset_degrees_spun()
+                self.right_wheel.reset_degrees_spun()
                 break
-        print("Left/right wheel end positions:", current_left, current_right)
+
 
     def turn_degrees(self,
                      degrees,
@@ -157,21 +149,18 @@ class DriveSystem(object):
         where positive is clockwise and negative is counter-clockwise),
         stopping by using the given StopAction.
         """
-        # TODO: Do a few experiments to determine the constant that converts
-        # TODO:   from wheel-degrees-spun to robot-degrees-turned.
-        # TODO:   Assume that the conversion is linear with respect to speed.
+        # DONE: Do a few experiments to determine the constant that converts
+        # DONE:   from wheel-degrees-spun to robot-degrees-turned.
+        # DONE:   Assume that the conversion is linear with respect to speed.
         self.start_moving(duty_cycle_percent,
-                          duty_cycle_percent * (0))
-        start_right = self.drive_system.right_wheel.get_degrees_spun()
-        start_left = self.drive_system.right_wheel.get_degrees_spun()
-        print("Left/right wheel initial positions:", start_left, start_right)
-        current_right = self.drive_system.right_wheel.get_degrees_spun()
-        current_left = self.drive_system.left_wheel.get_degrees_spun()
+                          duty_cycle_percent * 0)
+
         while True:
-            if current_left >= current_left + 1 * degrees:
+            if fabs(self.left_wheel.get_degrees_spun()) >= 954 // 90 * degrees:
                 self.stop_moving(stop_action)
+                self.left_wheel.reset_degrees_spun()
+                self.right_wheel.reset_degrees_spun()
                 break
-        print("Left/right wheel end positions:", current_left, current_right)
 
 
 class ArmAndClaw(object):
