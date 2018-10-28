@@ -244,11 +244,6 @@ class ColorSensor(rb.ColorSensor):
             if self.get_reflected_intensity()>reflected_light_intensity:
                 break
 
-
-
-
-
-
         # Done.
 
     def wait_until_intensity_is_greater_than(self, reflected_light_intensity):
@@ -288,6 +283,7 @@ class ColorSensor(rb.ColorSensor):
             for k in range(len(colors)):
                 if self.get_color() == colors[k]:
                     break
+
 
 
 
