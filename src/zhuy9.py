@@ -15,7 +15,7 @@ def main():
     robot.drive_system.go_straight_inches(1)
 
     # make_polygon(5)
-    # follow_the_black-line()
+    # follow_the_black_line()
 
 def make_polygon(n):
     robot = rb.Snatch3rRobot()
