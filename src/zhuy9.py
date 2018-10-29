@@ -47,11 +47,11 @@ def follow_black_line_advanced():
             rem_direction = -1
         robot.drive_system.stop_moving(45)
 
-        while True:
-            robot.drive_system.start_moving(100, 100)
-            if robot.color_sensor.get_color() != 1:
-                robot.drive_system.stop_moving()
-                robot.drive_system.start_moving(-14 * rem_direction, 99 * rem_direction)
+    while True:
+        robot.drive_system.start_moving(100, 100)
+        if robot.color_sensor.get_color() != 1:
+            robot.drive_system.stop_moving()
+            robot.drive_system.start_moving(-14 * rem_direction, 99 * rem_direction)
 
 
 main()
