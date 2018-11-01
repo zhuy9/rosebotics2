@@ -12,7 +12,8 @@ class Wheel(object):
     def __init__(self,
                  port,
                  default_duty_cycle_percent=100,
-                 default_stop_action=ev3.Motor.STOP_ACTION_BRAKE):
+                 default_stop_action=ev3.Motor.STOP_ACTION_BRAKE,
+                 is_arm=False):
         """
         Constructs a LargeMotor at the given port, where port should be one of:
           -- ev3.OUTPUT_A       ev3.OUTPUT_B    ev3.OUTPUT_C
@@ -23,16 +24,20 @@ class Wheel(object):
                of the duty_cycle_percent as the "power level" sent to the motor
                when we ask the motor to start spinning.
           -- stop_action:  What the motor should do when told to stop.  One of:
-               -- StopAction.BRAKE      StopAction.COAST    StopAction.HOLD
+               -- StopAction.BRAKE.value      StopAction.COAST.value
+                      StopAction.HOLD.value
         Resets the wheel positions to 0.
 
           :type  default_duty_cycle_percent:  int
           :type  default_stop_action:         StopAction
         """
-        self.motor = ev3.LargeMotor(port)
+        if is_arm:
+            self.motor = ev3.MediumMotor(port)
+        else:
+            self.motor = ev3.LargeMotor(port)
         assert self.motor.connected,\
             ("A wheel motor appears to not be connected.\n"
-             + "  Check the B and C jacks.  Are the plugs connected securely?")
+             + "  Check the A, B and C jacks.  Are the plugs connected securely?")
 
         self.default_duty_cycle_percent = default_duty_cycle_percent
         self.default_stop_action = default_stop_action
@@ -61,7 +66,7 @@ class Wheel(object):
         """
         if stop_action is None:
             stop_action = self.default_stop_action
-        self.motor.stop(stop_action=stop_action.value)
+        self.motor.stop(stop_action=stop_action)
 
     def get_degrees_spun(self):
         return self.motor.position
@@ -91,25 +96,19 @@ class TouchSensor(object):
         return self.sensor.is_pressed
 
 
-# class Camera(Sensor):
-#     """
-#     XXX
-#     """
-#
-#     def __init__(self, port=ev3.INPUT_2):
-#         """
-#         Constructs a Camera at the given port, where  port  should be one of:
-#           ev3.INPUT_1    ev3.INPUT_2    ev3.INPUT_3    ev3.INPUT_4
-#         """
-#         super().__init__(port, Sensor)
-#
-#     def get_value(self):
-#         """
-#         Returns a 3-tuple (R, G, B) where
-#           - R/G/B is the amount of Red/Green/Blue light reflected, respectively,
-#           - each number is in the range from 0 (none reflected) to 1020.
-#         """
-#         return self.sensor.raw()
+class Camera(object):
+    """ The Pixy camera. """
+
+    def __init__(self, port=ev3.INPUT_2):
+        """
+        Constructs a Sensor at the given port, where  port  should be one of:
+          ev3.INPUT_1    ev3.INPUT_2    ev3.INPUT_3    ev3.INPUT_4
+        """
+        self.port = port
+        self.sensor = ev3.Sensor(port, driver_name="pixy-lego")
+        assert self.sensor.connected,\
+            ("The camera sensor appears to not be connected.\n"
+             + "  Check the jack labelled 2.  Is the plug connected securely?")
 
 
 class ColorSensor(object):
@@ -153,108 +152,45 @@ class ColorSensor(object):
 
     def get_reflected_intensity(self):
         """
-        Returns how much light is reflected by the sensor,
+        Returns how much light is reflected by the light emitted by the sensor,
         ranging from 0 (no light reflected) to 100 (maximum light reflected).
         """
         return self.sensor.reflected_light_intensity
 
+    def red(self):
+        """ Returns the amount of light reflected by a RED light. """
+        return self.sensor.red
 
-# class InfraredForSensingProximity(ev3.InfraredSensor):
-#     """
-#     The physical Infrared Sensor can be used to measure proximity (distance)
-#     to the nearest object in its range of vision.  In this mode,
-#     the sensor emits infrared and measures properties of the reflected signal.
-#     """
-#
-#     def __init__(self, port):
-#         """
-#         Constructs an InfraredSensor at the given port,
-#         where  port  should be one of:
-#           ev3.INPUT_1    ev3.INPUT_2    ev3.INPUT_3    ev3.INPUT_4
-#         """
-#         self.port = port
-#         super().__init__(port)
-#
-#     def get_value(self):
-#         """
-#         Returns the distance to the nearest object detected, in inches.
-#         """
-#         return self.distance_inches
-#
-#     def get_distance_in_inches(self):
-#         """
-#         Returns the distance to the nearest object detected, in inches.
-#         """
-#         return self.sensor.distance_inches
-#
-#     def get_distance_in_centimeters(self):
-#         """
-#         Returns the distance to the nearest object detected, in centimeters.
-#         """
-#         return self.sensor.distance_centimeters
-#
-#     def is_other_sensor_present(self):
-#         """
-#         Returns True if another ultrasonic sensor could be heard nearby,
-#         else returns False.
-#         """
-#         return self.sensor.other_sensor_present
-#
-#
-# class InfraredForSensingBeacon(ev3.BeaconSeeker):
-#     """
-#     The physical Infrared Sensor can be used to measure distance and heading
-#     to the nearest source of the signal emitted by the Remote Beacon.  In this
-#     mode, the sensor measures properties of any infrared signal in its range.
-#     """
-#
-#     def __init__(self, port):
-#         """
-#         Constructs an InfraredSensor at the given port,
-#         where  port  should be one of:
-#           ev3.INPUT_1    ev3.INPUT_2    ev3.INPUT_3    ev3.INPUT_4
-#         """
-#         self.port = port
-#         super().__init__(port)
-#
-#     def get_value(self):
-#         """
-#         Returns the distance to the nearest object detected, in inches.
-#         """
-#         return self.sensor.distance_inches
-#
+    def green(self):
+        """ Returns the amount of light reflected by a GREEN light. """
+        return self.sensor.green
 
-# class UltrasonicSensor(object):
-#     def __init__(self, port):
-#         """
-#         Constructs an UltrasonicSensor at the given port,
-#         where  port  should be one of:
-#           ev3.INPUT_1    ev3.INPUT_2    ev3.INPUT_3    ev3.INPUT_4
-#         """
-#         self.port = port
-#         self.sensor = ev3.UltrasonicSensor(port)
-#
-#     def get_value(self):
-#         """
-#         Returns the distance to the nearest object detected, in inches.
-#         """
-#         return self.sensor.distance_inches
-#
-#     def get_distance_in_inches(self):
-#         """
-#         Returns the distance to the nearest object detected, in inches.
-#         """
-#         return self.sensor.distance_inches
-#
-#     def get_distance_in_centimeters(self):
-#         """
-#         Returns the distance to the nearest object detected, in centimeters.
-#         """
-#         return self.sensor.distance_centimeters
-#
-#     def is_other_sensor_present(self):
-#         """
-#         Returns True if another ultrasonic sensor could be heard nearby,
-#         else returns False.
-#         """
-#         return self.sensor.other_sensor_present
+    def blue(self):
+        """ Returns the amount of light reflected by a BLUE light. """
+        return self.sensor.blue
+
+
+class InfraredSensor(object):
+    def __init__(self, port):
+        """
+        Constructs an InfraredSensor at the given port,
+        where  port  should be one of:
+          ev3.INPUT_1    ev3.INPUT_2    ev3.INPUT_3    ev3.INPUT_4
+        """
+        self.port = port
+        self.proximity_sensor = ev3.InfraredSensor(port)
+
+        assert self.proximity_sensor.connected,\
+            ("The IR sensor appears to not be connected.\n"
+             + "  Check the jack labelled 4.  Is the plug connected securely?")
+
+    def get_distance_to_nearest_object(self):
+        return self.proximity_sensor.proximity
+
+
+class BeaconButtonController(ev3.RemoteControl):
+    """ Controls the buttons on the Beacon. """
+
+
+class BrickButtonSensor(ev3.Button):
+    """ Controls the buttons on the Brick. """

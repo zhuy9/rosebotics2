@@ -1,11 +1,10 @@
 """
   Capstone Project.  Code for testing basics.
   Author:  David Mutchler, based on work by Dave Fisher and others.
-  READ and RUN this module but ** DO NOT MODIFY IT. **
   Fall term, 2018-2019.
 """
 
-import rosebotics as rb
+import rosebotics_new as rb
 import time
 
 
@@ -16,9 +15,44 @@ def main():
 
 def run_tests():
     """ Runs various tests. """
+    # run_test_ir()
     run_test_drive_system()
     # run_test_touch_sensor()
     # run_test_color_sensor()
+    run_test_arm()
+
+
+def run_test_arm():
+    robot = rb.Snatch3rRobot()
+    robot.arm.calibrate()
+    time.sleep(1)
+    robot.arm.raise_arm_and_close_claw()
+    time.sleep(1)
+    robot.arm.move_arm_to_position(300)
+
+
+def run_test_ir():
+    robot = rb.Snatch3rRobot()
+
+    while True:
+        # TODO: Print the value of the following, one at a time. For each,
+        # TODO:   do the appropriate user actions (e.g. try pressing a button
+        # TODO:   on the Beacon and see what the beacon_button_sensor produces).
+        # TODO:   Discover what values the sensors produce in which situations.
+        #    touch_sensor
+        #    color_sensor
+        #    camera
+        #    proximity_sensor
+        #    beacon_sensor  NOT YET IMPLEMENTED
+        #    beacon_button_sensor  NOT YET IMPLEMENTED
+        print("Touch sensor:",
+              robot.touch_sensor.get_value(),
+              robot.touch_sensor.is_pressed())
+
+        character = input(
+            "Press the ENTER (return) key to continue, or q to quit: ")
+        if character == "q":
+            break
 
 
 def run_test_drive_system():
@@ -53,7 +87,7 @@ def run_test_drive_system():
     print("Move forward at full speed for 1.5 seconds, coast to stop")
     robot.drive_system.start_moving()
     time.sleep(1.5)
-    robot.drive_system.stop_moving(rb.StopAction.COAST)
+    robot.drive_system.stop_moving(rb.StopAction.COAST.value)
 
     print("Left/right wheel positions:",
           robot.drive_system.left_wheel.get_degrees_spun(),
