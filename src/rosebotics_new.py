@@ -675,13 +675,6 @@ class ArmAndClaw(object):
         (Hence, 0 means all the way DOWN and 14.2 * 360 means all the way UP).
         """
         # TODO: Do this as STEP 2 of implementing this class.
-        self.raise_arm_and_close_claw()
-        self.motor.reset_degrees_spun(0)
-        self.motor.start_spinning(100)
-        while True:
-            if self.motor.get_degrees_spun() < 14.2 * 360:
-                self.motor.stop_spinning()
-                break
 
     def raise_arm_and_close_claw(self):
         """
@@ -691,11 +684,6 @@ class ArmAndClaw(object):
         Stop when the touch sensor is pressed.
         """
         # TODO: Do this as STEP 1 of implementing this class.
-        self.motor.start_spinning(100)
-        while True:
-            if self.touch_sensor.is_pressed():
-                self.motor.stop_spinning()
-                break
 
     def move_arm_to_position(self, position):
         """

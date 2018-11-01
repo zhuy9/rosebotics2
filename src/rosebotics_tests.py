@@ -24,7 +24,12 @@ def run_tests():
 
 def run_test_arm():
     robot = rb.Snatch3rRobot()
-    robot.calibrate()
+    robot.arm.calibrate()
+    time.sleep(1)
+    robot.arm.raise_arm_and_close_claw()
+    time.sleep(1)
+    robot.arm.move_arm_to_position(300)
+
 
 def run_test_ir():
     robot = rb.Snatch3rRobot()
@@ -38,26 +43,12 @@ def run_test_ir():
         #    color_sensor
         #    camera
         #    proximity_sensor
-        #    beacon_sensor
-        #    beacon_button_sensor
+        #    beacon_sensor  NOT YET IMPLEMENTED
+        #    beacon_button_sensor  NOT YET IMPLEMENTED
         print("Touch sensor:",
               robot.touch_sensor.get_value(),
               robot.touch_sensor.is_pressed())
-        print("Color sensor:",
-              robot.color_sensor.get_reflected_intensity(),
-              robot.color_sensor.get_color(),
-              robot.color_sensor.get_value(),
-              robot.color_sensor.red(),
-              robot.color_sensor.green(),
-              robot.color_sensor.blue())
-        print("Camera:", robot.camera.get_biggest_blob())
-        print("Proximity:",
-              robot.proximity_sensor.get_distance_to_nearest_object())
-        # print("Beacon heading/distance:",
-        #       robot.beacon_sensor.get_heading_to_beacon(),
-        #       robot.beacon_sensor.get_distance_to_beacon(),
-        #       robot.beacon_sensor.get_heading_and_distance_to_beacon())
-        print(robot.brick_button_sensor.get_buttons_pressed())
+
         character = input(
             "Press the ENTER (return) key to continue, or q to quit: ")
         if character == "q":
