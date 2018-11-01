@@ -373,8 +373,18 @@ class Camera(object):
        their colleagues, the entire team, and PUT_YOUR_NAME_HERE.
     """
 
-    def __init__(self, port=ev3.INPUT_3):
-        self.low_level_camera = ev3.Sensor(port, driver_name="pixy-lego")
+    def __init__(self, port=ev3.INPUT_2):
+        try:
+            self.low_level_camera = ev3.Sensor(port, driver_name="pixy-lego")
+        except AssertionError:
+            print("Is the camera plugged into port 2?")
+            print("If that is not the problem, then check whether the camera")
+            print("has gotten into 'Arduino mode', as follows:")
+            print("In PixyMon, select the gear (Configure) icon,")
+            print("then look for a tab that has 'Arduino' on its page.")
+            print("Make sure it says 'Lego' and not 'Arduino'.")
+            print("Note: Only some of the cameras have this option;")
+            print("the others are automatically OK in this regard.")
         self.set_signature("SIG1")
 
     def set_signature(self, signature_name):
