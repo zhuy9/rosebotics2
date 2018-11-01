@@ -12,7 +12,8 @@ class Wheel(object):
     def __init__(self,
                  port,
                  default_duty_cycle_percent=100,
-                 default_stop_action=ev3.Motor.STOP_ACTION_BRAKE):
+                 default_stop_action=ev3.Motor.STOP_ACTION_BRAKE,
+                 is_arm=False):
         """
         Constructs a LargeMotor at the given port, where port should be one of:
           -- ev3.OUTPUT_A       ev3.OUTPUT_B    ev3.OUTPUT_C
@@ -23,16 +24,20 @@ class Wheel(object):
                of the duty_cycle_percent as the "power level" sent to the motor
                when we ask the motor to start spinning.
           -- stop_action:  What the motor should do when told to stop.  One of:
-               -- StopAction.BRAKE      StopAction.COAST    StopAction.HOLD
+               -- StopAction.BRAKE.value      StopAction.COAST.value
+                      StopAction.HOLD.value
         Resets the wheel positions to 0.
 
           :type  default_duty_cycle_percent:  int
           :type  default_stop_action:         StopAction
         """
-        self.motor = ev3.LargeMotor(port)
+        if is_arm:
+            self.motor = ev3.MediumMotor(port)
+        else:
+            self.motor = ev3.LargeMotor(port)
         assert self.motor.connected,\
             ("A wheel motor appears to not be connected.\n"
-             + "  Check the B and C jacks.  Are the plugs connected securely?")
+             + "  Check the A, B and C jacks.  Are the plugs connected securely?")
 
         self.default_duty_cycle_percent = default_duty_cycle_percent
         self.default_stop_action = default_stop_action
@@ -61,7 +66,7 @@ class Wheel(object):
         """
         if stop_action is None:
             stop_action = self.default_stop_action
-        self.motor.stop(stop_action=stop_action.value)
+        self.motor.stop(stop_action=stop_action)
 
     def get_degrees_spun(self):
         return self.motor.position
@@ -92,9 +97,7 @@ class TouchSensor(object):
 
 
 class Camera(object):
-    """
-    XXX
-    """
+    """ The Pixy camera. """
 
     def __init__(self, port=ev3.INPUT_2):
         """
@@ -102,7 +105,7 @@ class Camera(object):
           ev3.INPUT_1    ev3.INPUT_2    ev3.INPUT_3    ev3.INPUT_4
         """
         self.port = port
-        self.sensor = ev3.Sensor(port)
+        self.sensor = ev3.Sensor(port, driver_name="pixy-lego")
         assert self.sensor.connected,\
             ("The camera sensor appears to not be connected.\n"
              + "  Check the jack labelled 2.  Is the plug connected securely?")
@@ -149,23 +152,33 @@ class ColorSensor(object):
 
     def get_reflected_intensity(self):
         """
-        Returns how much light is reflected by the sensor,
+        Returns how much light is reflected by the light emitted by the sensor,
         ranging from 0 (no light reflected) to 100 (maximum light reflected).
         """
         return self.sensor.reflected_light_intensity
+
+    def red(self):
+        """ Returns the amount of light reflected by a RED light. """
+        return self.sensor.red
+
+    def green(self):
+        """ Returns the amount of light reflected by a GREEN light. """
+        return self.sensor.green
+
+    def blue(self):
+        """ Returns the amount of light reflected by a BLUE light. """
+        return self.sensor.blue
 
 
 class InfraredSensor(object):
     def __init__(self, port):
         """
-        Constructs a TouchSensor at the given port,
+        Constructs an InfraredSensor at the given port,
         where  port  should be one of:
           ev3.INPUT_1    ev3.INPUT_2    ev3.INPUT_3    ev3.INPUT_4
         """
         self.port = port
         self.proximity_sensor = ev3.InfraredSensor(port)
-        self.beacon_sensor = ev3.BeaconSeeker(port)
-        self.beacon_button_sensor = ev3.BeaconSeeker(port)
 
         assert self.proximity_sensor.connected,\
             ("The IR sensor appears to not be connected.\n"
@@ -173,12 +186,6 @@ class InfraredSensor(object):
 
     def get_distance_to_nearest_object(self):
         return self.proximity_sensor.proximity
-
-    def get_heading_and_distance_to_beacon(self):
-        """
-        Returns a 2-tuple containing the heading and distance to the Beacon.
-        """
-        return self.beacon_sensor.heading_and_distance
 
 
 class BeaconButtonController(ev3.RemoteControl):

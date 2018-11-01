@@ -104,7 +104,7 @@ class Button(Enum):
 #   self.right_button:    BrickButton
 #   self.back_button:     BrickButton
 #
-# Motors and sensors:
+# Motors and sensors, combined:
 #   self.drive_system:   DriveSystem
 #   self.arm:            ArmAndClaw
 # ------------------------------------------------------------------------------
@@ -132,11 +132,10 @@ class Snatch3rRobot(object):
         self.color_sensor = ColorSensor(color_sensor_port)
         self.camera = Camera(camera_port)
 
-        # The physical infrared sensor has three modes, so three "components":
-        ir_sensor = low_level_rb.InfraredSensor(ir_sensor_port)
-        self.proximity_sensor = InfraredAsProximitySensor(ir_sensor)
-        self.beacon_sensor = InfraredAsBeaconSensor(ir_sensor)
-        self.beacon_button_sensor = InfraredAsBeaconButtonSensor(ir_sensor)
+        self.proximity_sensor = InfraredAsProximitySensor(ir_sensor_port)
+        # self.beacon_sensor = InfraredAsBeaconSensor(channel=1)
+        # self.beacon_button_sensor = InfraredAsBeaconButtonSensor(ir_sensor,
+        #                                                          channel=1)
 
         self.brick_button_sensor = BrickButtonSensor()
 
@@ -172,7 +171,7 @@ class DriveSystem(object):
         self.left_wheel.start_spinning(left_wheel_duty_cycle_percent)
         self.right_wheel.start_spinning(right_wheel_duty_cycle_percent)
 
-    def stop_moving(self, stop_action=StopAction.BRAKE):
+    def stop_moving(self, stop_action=StopAction.BRAKE.value):
         """
         STOPS the robot, using the given StopAction (which defaults to BRAKE).
         """
@@ -199,7 +198,7 @@ class DriveSystem(object):
         start_time = time.time()
         while True:
             if time.time() - start_time > seconds:
-                self.stop_moving(stop_action)
+                self.stop_moving(stop_action.value)
                 break
 
     def go_straight_inches(self,
@@ -267,6 +266,10 @@ class TouchSensor(low_level_rb.TouchSensor):
     def __init__(self, port=ev3.INPUT_1):
         super().__init__(port)
 
+    def is_pressed(self):
+        """ Returns True if the TouchSensor is currently pressed. """
+        return self.get_value() == 1
+
     def wait_until_pressed(self):
         """ Waits (doing nothing new) until the touch sensor is pressed. """
         # TODO.
@@ -285,6 +288,43 @@ class ColorSensor(low_level_rb.ColorSensor):
 
     def __init__(self, port=ev3.INPUT_3):
         super().__init__(port)
+
+
+    def get_color(self):
+        """
+        Returns its best guess as to the color of the object upon which it is
+        shining R/G/B pulses of light.  The value returned is one of:
+          Color.NO_COLOR   Color.BLACK   Color.BLUE    Color.GREEN
+          Color.YELLOW     Color.RED     Color.WHITE   Color.BROWN
+        """
+        return super().get_color()
+
+    def get_reflected_intensity(self):
+        """
+        Returns how much light is reflected by the light emitted by the sensor,
+        ranging from 0 (no light reflected) to 100 (maximum light reflected).
+        """
+        return super().get_reflected_intensity()
+
+    def get_value(self):
+        """
+         Returns a 3-tuple (R, G, B) where
+          - R/G/B is the amount of Red/Green/Blue light reflected, respectively,
+          - each number is in the range from 0 (none reflected) to 1020.
+        """
+        return super().get_value()
+
+    def red(self):
+        """ Returns the amount of light reflected by a RED light. """
+        return super().red()
+
+    def green(self):
+        """ Returns the amount of light reflected by a GREEN light. """
+        return super().green()
+
+    def blue(self):
+        """ Returns the amount of light reflected by a BLUE light. """
+        return super().blue()
 
     def wait_until_intensity_is_less_than(self, reflected_light_intensity):
         """
@@ -343,8 +383,19 @@ class Camera(object):
     def get_biggest_blob(self):
         """
         A "blob" is a collection of connected pixels that are all in the color
-        range specified by a color "signature".  The Pixy camera returns a Blob
-        for whatever color signature the Pixy has been trained up on.
+        range specified by a color "signature".  A Blob object stores the Point
+        that is the center (actually, centroid) of the blob along with the
+        width and height of the blob.  For a Pixy camera, the x-coordinate is
+        between 0 and 319 (0 left, 319 right) and the y-coordinate is between
+        0 and 199 (0 TOP, 199 BOTTOM).  See the Blob class below.
+
+        A Camera returns the largest Blob whose pixels fall within the Camera's
+        current color signature.  A Blob whose width and height are zero
+        indicates that no large enough object within the current color signature
+        was visible.
+
+        The Camera's color signature defaults to "SIG1", which is the color
+        signature set by selecting the RED light when training the Pixy camera.
         """
         return Blob(Point(self.low_level_camera.value(1),
                           self.low_level_camera.value(2)),
@@ -364,30 +415,30 @@ class Blob(object):
       upper-left corner along with width and height.
     """
 
-    def __init__(self, upper_left_corner, width, height):
-        self.upper_left_corner = upper_left_corner
+    def __init__(self, center, width, height):
+        self.center = center
         self.width = width
         self.height = height
         self.screen_limits = Point(320, 240)  # FIXME
 
-    def get_center(self):
-        return Point(self.upper_left_corner.x + self.width // 2,
-                     self.upper_left_corner.y + self.height // 2)
+    def __repr__(self):
+        return "center: ({:3d}, {:3d})  width, height: {:3d} {:3d}.".format(
+            self.center.x, self.center.y, self.width, self.height)
 
     def get_area(self):
         return self.width * self.height
 
     def is_against_left_edge(self):
-        return self.upper_left_corner.x <= 0
+        return self.center.x - (self.width + 1) / 2 <= 0
 
     def is_against_right_edge(self):
-        return self.upper_left_corner.x + self.width >= self.screen_limits.x
+        return self.center.x + (self.width / 2 + 1) / 2 >= self.screen_limits.x
 
     def is_against_top_edge(self):
-        return self.upper_left_corner.y <= 0
+        return self.center.y - (self.height + 1) / 2 <= 0
 
     def is_against_bottom_edge(self):
-        return self.upper_left_corner.y + self.height >= self.screen_limits.y
+        return self.center.y + (self.height + 1) / 2 >= self.screen_limits.y
 
     def is_against_an_edge(self):
         return (self.is_against_left_edge()
@@ -396,41 +447,41 @@ class Blob(object):
                 or self.is_against_bottom_edge())
 
 
-class InfraredAsProximitySensor(object):
+class InfraredAsProximitySensor(low_level_rb.InfraredSensor):
     """
     A class for the infrared sensor when it is in the mode in which it
     measures distance to the nearest object that it sees.
     Primary authors:  The ev3dev authors, David Mutchler, Dave Fisher,
        their colleagues, the entire team, and PUT_YOUR_NAME_HERE.
     """
-
     # TODO: In the above line, put the name of the primary author of this class.
 
-    def __init__(self, ir_sensor):
-        self._underlying_ir_sensor = ir_sensor
+    def __init__(self, ir_sensor_port):
+        super().__init__(ir_sensor_port)
 
     def get_distance_to_nearest_object(self):
         """
         Returns the distance to the nearest object in its field of vision,
-        as a integer between -1 and 100, where:
-           ?? means no object is seen (find out through experimenting!)
-            0 means the object is as close as the sensor can detect
-               (about ?? inches, find out through experimenting!)
-          100 means the object is as far as the sensor can detect
-               (about ?? inches, find out through experimenting!)
+        as a integer between 0 and 100, where a value N indicates that the
+        distance to the nearest object is 70 * (N/100) cm.  For example:
+           - numbers < 10 indicate that the object is less than 7 cm away
+           - 20 means 1/5 of 70, i.e., 14 cm
+           - 40 means 2/5 of 70, i.e., 28 cm
+           - 50 means 1/2 of 70, i.e., 35 cm
+           - greater than 70 is too far away to be useful
+               (more precisely, greater than 49 cm away)
+           - 100 is the maximum distance for the sensor, namely, 100 cm.
         """
-        return self._underlying_ir_sensor.get_distance_to_nearest_object()
-        # TODO: Do a few experiments, printing this sensor's value with
-        # TODO: objects in front of it at various distances, to determine
-        # TODO the missing values in the above docstring.
+        return super().get_distance_to_nearest_object()
 
     def get_distance_to_nearest_object_in_inches(self):
         """
         Returns the distance to the nearest object in its field of vision,
-        in inches.  Returns None if it sees no object.
+        in inches, where about 39.37 inches (which is 100 cm) means no object
+        is within its field of vision.
         """
-        # TODO: Implement this by having it call the above function with
-        # TODO: an appropriate conversion factor.
+        inches_per_cm = 2.54
+        return 70 * inches_per_cm * self.get_distance_to_nearest_object() / 100
 
 
 class InfraredAsBeaconSensor(object):
@@ -439,25 +490,23 @@ class InfraredAsBeaconSensor(object):
     measures the heading and distance to the Beacon when the Beacon is emitting
     its signal continuously ("beacon mode") on one of its 4 channels (1 to 4).
     Primary authors:  The ev3dev authors, David Mutchler, Dave Fisher,
-    their colleagues, the entire team, and PUT_YOUR_NAME_HERE.
+    their colleagues, and the entire team.
     """
 
-    # TODO: In the above line, put the name of the primary author of this class.
-
-    def __init__(self, ir_sensor, channel=None):
-        self._underlying_ir_sensor = ir_sensor
-        if channel:  # None means use the given InfraredSensor's channel
-            self._underlying_ir_sensor.channel = channel
+    def __init__(self, channel=1):
+        self.channel = channel
+        self._underlying_ir_sensor = ev3.BeaconSeeker()
 
     def set_channel(self, channel):
         """
         Makes this sensor look for signals on the given channel. The physical
         Beacon has a switch that can set the channel to 1, 2, 3 or 4.
         """
-        self._underlying_ir_sensor.channel = channel
+        self.channel = channel
+        self._underlying_ir_sensor = ev3.BeaconSeeker()
 
     def get_channel(self):
-        return self._underlying_ir_sensor.channel
+        return self.channel
 
     def get_heading_and_distance_to_beacon(self):
         """
@@ -471,21 +520,21 @@ class InfraredAsBeaconSensor(object):
          - Distance is from 0 to 100, where 100 is about 70 cm
          - -128 means the Beacon is not detected.
         """
-        return self._underlying_ir_sensor.get_heading_and_distance_to_beacon()
+        return self._underlying_ir_sensor.heading_and_distance
 
     def get_heading_to_beacon(self):
         """
         Returns the heading to the Beacon.
         Units are per the   get_heading_and_distance_to_beacon   method.
         """
-        # TODO
+        return self._underlying_ir_sensor.heading
 
     def get_distance_to_beacon(self):
         """
         Returns the heading to the Beacon.
         Units are per the   get_heading_and_distance_to_beacon   method.
         """
-        # TODO
+        return self._underlying_ir_sensor.distance
 
 
 class InfraredAsBeaconButtonSensor(object):
@@ -495,10 +544,9 @@ class InfraredAsBeaconButtonSensor(object):
     Primary authors:  The ev3dev authors, David Mutchler, Dave Fisher,
     their colleagues, the entire team, and PUT_YOUR_NAME_HERE.
     """
-
     # TODO: In the above line, put the name of the primary author of this class.
 
-    def __init__(self, ir_sensor, channel=None):
+    def __init__(self, ir_sensor, channel=1):
         self._underlying_ir_sensor = ir_sensor
         if channel:  # None means use the given InfraredSensor's channel
             self._underlying_ir_sensor.channel = channel
@@ -553,7 +601,6 @@ class BrickButtonSensor(object):
     Primary authors:  The ev3dev authors, David Mutchler, Dave Fisher,
     their colleagues, the entire team, and PUT_YOUR_NAME_HERE.
     """
-
     # TODO: In the above line, put the name of the primary author of this class.
 
     def __init__(self):
@@ -567,11 +614,15 @@ class BrickButtonSensor(object):
             "backspace": BACK_BUTTON
         }
 
+    def process(self):
+        self._underlying_sensor.process()
+
     def get_buttons_pressed(self):
         """
         Returns a list of the numbers corresponding to buttons on the Beacon
         which are currently pressed.
         """
+        self.process()
         button_list = self._underlying_sensor.buttons_pressed
         for k in range(len(button_list)):
             button_list[k] = self.button_names[button_list[k]]
@@ -596,14 +647,17 @@ class BrickButtonSensor(object):
 
 
 class ArmAndClaw(object):
-    """ Primary author of this class:  PUT_YOUR_NAME_HERE. """
-
+    """
+    A class for the arm and its associated claw.
+    Primary authors:  The ev3dev authors, David Mutchler, Dave Fisher,
+    their colleagues, the entire team, and PUT_YOUR_NAME_HERE.
+    """
     # TODO: In the above line, put the name of the primary author of this class.
 
     def __init__(self, touch_sensor, port=ev3.OUTPUT_A):
         # The ArmAndClaw's  motor  is not really a Wheel, of course,
         # but it can do exactly what a Wheel can do.
-        self.motor = low_level_rb.Wheel(port)
+        self.motor = low_level_rb.Wheel(port, is_arm=True)
 
         # The ArmAndClaw "has" the TouchSensor that is at the back of the Arm.
         self.touch_sensor = touch_sensor
@@ -616,29 +670,36 @@ class ArmAndClaw(object):
     def calibrate(self):
         """
         Raise the arm at a reasonable speed until the touch sensor is pressed.
-        Then lower the arm XXX units, again at a reasonable speed.
-        Set the motor's position to 0 at that point.
-        (Hence, 0 means all the way DOWN and XXX means all the way UP).
+        Then lower the arm 14.2 revolutions (i.e., 14.2 * 360 degrees),
+        again at a reasonable speed. Then set the motor's position to 0.
+        (Hence, 0 means all the way DOWN and 14.2 * 360 means all the way UP).
         """
-        # TODO
+        # TODO: Do this as STEP 2 of implementing this class.
+        self.raise_arm_and_close_claw()
+        self.motor.reset_degrees_spun(0)
+        self.motor.start_spinning(100)
+        while True:
+            if self.motor.get_degrees_spun() < 14.2 * 360:
+                self.motor.stop_spinning()
+                break
 
     def raise_arm_and_close_claw(self):
         """
-        Lower the arm (and hence close the claw) at a reasonable speed.
+        Raise the arm (and hence close the claw), by making this ArmAndClaw
+        object's motor start spinning at a reasonable speed (e.g. 100).
+        Positive speeds make the arm go UP; negative speeds make it go DOWN.
         Stop when the touch sensor is pressed.
         """
-        # TODO
-
-    def lower_arm_and_open_claw(self):
-        """
-        Lower the arm (and hence open the claw) at a reasonable speed.
-        Stop when position 0 is reached.
-        """
-        # TODO
+        # TODO: Do this as STEP 1 of implementing this class.
+        self.motor.start_spinning(100)
+        while True:
+            if self.touch_sensor.is_pressed():
+                self.motor.stop_spinning()
+                break
 
     def move_arm_to_position(self, position):
         """
         Spin the arm's motor until it reaches the given position.
         Move at a reasonable speed.
         """
-        # TODO
+        # TODO: Do this as STEP 3 of implementing this class.
