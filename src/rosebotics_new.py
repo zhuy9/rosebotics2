@@ -2,10 +2,10 @@
   Capstone Project.
   This module contains high-level, general-purpose methods for a Snatch3r robot.
 
-  Team members:  PUT_YOUR_NAMES_HERE.
+  Team members:  Yuchen Zhu & Bryan Wolfe
   Fall term, 2018-2019.
 """
-# TODO: Put your names in the above.
+# DONE: Put your names in the above.
 # TODO: Do the TODO's below.
 # TODO: Augment this module as appropriate, being sure to always
 # TODO:   ** coordinate with your teammates ** in doing so.
@@ -14,6 +14,7 @@ from ev3dev import ev3
 from enum import Enum
 import low_level_rosebotics_new as low_level_rb
 import time
+from math import *
 
 # ------------------------------------------------------------------------------
 # Global constants.  Reference them as (for example):  rb.BRAKE   rb.GREEN
@@ -147,10 +148,10 @@ class DriveSystem(object):
     """
     A class for driving (moving) the robot.
     Primary authors:  The ev3dev authors, David Mutchler, Dave Fisher,
-       their colleagues, the entire team, and PUT_YOUR_NAME_HERE.
+       their colleagues, the entire team, and YUCHEN ZHU
     """
 
-    # TODO: In the above line, put the name of the primary author of this class.
+    # DONE: In the above line, put the name of the primary author of this class.
 
     def __init__(self,
                  left_wheel_port=ev3.OUTPUT_B,
@@ -210,7 +211,7 @@ class DriveSystem(object):
                           duty_cycle_percent)
         while True:
             if self.left_wheel.get_degrees_spun() >= 86 * inches:
-                self.stop_moving()
+                self.stop_moving(stop_action)
                 self.left_wheel.reset_degrees_spun()
                 self.right_wheel.reset_degrees_spun()
                 break
@@ -242,7 +243,7 @@ class DriveSystem(object):
                           -duty_cycle_percent)
         while True:
             if fabs(self.left_wheel.get_degrees_spun()) >= 5.7 * degrees:
-                self.stop_moving()
+                self.stop_moving(stop_action)
                 self.left_wheel.reset_degrees_spun()
                 self.right_wheel.reset_degrees_spun()
                 break
@@ -270,7 +271,7 @@ class DriveSystem(object):
 
         while True:
             if fabs(self.left_wheel.get_degrees_spun()) >= 954 // 90 * degrees:
-                self.stop_moving()
+                self.stop_moving(stop_action)
                 self.left_wheel.reset_degrees_spun()
                 self.right_wheel.reset_degrees_spun()
                 break
