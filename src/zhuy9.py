@@ -6,6 +6,7 @@
 
 import rosebotics_new as rb
 import time
+import ev3dev.ev3 as ev3
 
 
 def main():
@@ -16,6 +17,8 @@ def main():
 
     # make_polygon(5)
     # follow_the_black_line()
+    # beep_when_area_is_bigger_than(20)
+    # IR_sensor(10)
 
 def make_polygon(n):
     robot = rb.Snatch3rRobot()
@@ -53,5 +56,22 @@ def follow_black_line_advanced():
             robot.drive_system.stop_moving()
             robot.drive_system.start_moving(-14 * rem_direction, 99 * rem_direction)
         # to be tested
+
+def beep_when_area_is_bigger_than(area):
+        robot = rb.Snatch3rRobot()
+        while True:
+            if robot.camera.get_biggest_blob().get_area() >= area:
+                ev3.Sound.beep().wait()
+            if robot.touch_sensor.is_pressed() is True:
+                break
+
+def IR_sensor(distance):        # in inches, not SI.  emmmmm
+    robot = rb.Snatch3rRobot()
+    while True:
+        if robot.proximity_sensor.get_distance_to_nearest_object_in_inches() <= distance:
+            ev3.Sound.beep().wait()
+        if robot.touch_sensor.is_pressed() is True:
+            break
+
 
 main()
