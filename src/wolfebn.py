@@ -3,7 +3,7 @@
   Fall term, 2018-2019.
 """
 
-import rosebotics as rb
+import rosebotics_new as rb
 import time
 
 
@@ -14,5 +14,4 @@ def main():
 main()
     color = 'blue'
     robot = rb.Snatch3rRobot()
-    robot.drive_system.start_moving(100,100)
-    robot.color_sensor.wait_until_color_is(color)
+    robot.ArmAndClaw.calibrate()
