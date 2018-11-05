@@ -7,6 +7,8 @@
 import rosebotics_new as rb
 import time
 import ev3dev.ev3 as ev3
+import tkinter
+from tkinter import ttk
 
 
 def main():
@@ -73,5 +75,32 @@ def IR_sensor(distance):        # in inches, not SI.  emmmmm
         if robot.touch_sensor.is_pressed() is True:
             break
 
+def Infrared_Beacon_Button():
+    #A GUI running on your laptop has a button labeled “Infrared Beacon”.  Pressing the button makes the robot spin
+    # (once) toward the Beacon (which must be in “beacon mode”), then move (once) toward the Beacon.
+    root = tkinter.Tk()
+    root.title("test IR Beacon")
+
+    frame = ttk.Frame(root, padding=20)
+    frame.grid()
+
+    IR_Beacon = ttk.Button(frame, text="Infrared Beacon")
+    IR_Beacon.grid()
+    IR_Beacon['command'] = lambda:
+
+def spin_move_to_beacon():
+    robot = rb.Snatch3rRobot()
+    while True:
+        #    beacon_sensor
+        #    beacon_button_sensor
+        degree = robot.beacon_sensor.get_heading_to_beacon()
+        robot.drive_system.turn_degrees(degree)
+        distance = robot.beacon_sensor.get_distance_to_beacon()
+        robot.drive_system.go_straight_inches(0.7 * distance / 2.54)
+
+        character = input(
+            "Press the ENTER (return) key to continue, or q to quit: ")
+        if character == "q":
+            break
 
 main()

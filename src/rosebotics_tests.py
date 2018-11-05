@@ -54,6 +54,25 @@ def run_test_ir():
         if character == "q":
             break
 
+def run_test_beacon():
+    robot = rb.Snatch3rRobot()
+
+    while True:
+        #    beacon_sensor
+        #    beacon_button_sensor
+        print("beacon sensor:",
+              robot.beacon_sensor.get_heading_to_beacon(),
+              robot.beacon_sensor.get_distance_to_beacon(),
+              robot.beacon_button_sensor.is_beacon_button_pressed(),
+              robot.beacon_button_sensor.is_bottom_blue_button_pressed(),
+              robot.beacon_button_sensor.is_bottom_red_button_pressed(),
+              robot.beacon_button_sensor.is_top_blue_button_pressed(),
+              robot.beacon_button_sensor.is_top_red_button_pressed())
+
+        character = input(
+            "Press the ENTER (return) key to continue, or q to quit: ")
+        if character == "q":
+            break
 
 def run_test_drive_system():
     """ Tests the  drive_system  of the Snatch3rRobot. """
