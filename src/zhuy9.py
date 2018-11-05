@@ -78,6 +78,7 @@ def IR_sensor(distance):        # in inches, not SI.  emmmmm
 def Infrared_Beacon_Button():
     #A GUI running on your laptop has a button labeled “Infrared Beacon”.  Pressing the button makes the robot spin
     # (once) toward the Beacon (which must be in “beacon mode”), then move (once) toward the Beacon.
+    rbt = rb.Snatch3rRobot()
     root = tkinter.Tk()
     root.title("test IR Beacon")
 
@@ -86,10 +87,9 @@ def Infrared_Beacon_Button():
 
     IR_Beacon = ttk.Button(frame, text="Infrared Beacon")
     IR_Beacon.grid()
-    IR_Beacon['command'] = lambda:
+    IR_Beacon['command'] = lambda: spin_move_to_beacon(rbt)
 
-def spin_move_to_beacon():
-    robot = rb.Snatch3rRobot()
+def spin_move_to_beacon(robot):
     while True:
         #    beacon_sensor
         #    beacon_button_sensor
