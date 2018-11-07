@@ -45,9 +45,11 @@ def run_test_ir():
         #    proximity_sensor
         #    beacon_sensor  NOT YET IMPLEMENTED
         #    beacon_button_sensor  NOT YET IMPLEMENTED
-        print("Touch sensor:",
-              robot.touch_sensor.get_value(),
-              robot.touch_sensor.is_pressed())
+        print("Beacon sensor:",
+              robot.beacon_sensor.get_heading_to_beacon(),
+              robot.beacon_sensor.get_distance_to_beacon(),
+              robot.beacon_button_sensor.is_bottom_blue_button_pressed(),
+              robot.beacon_button_sensor.is_bottom_red_button_pressed())
 
         character = input(
             "Press the ENTER (return) key to continue, or q to quit: ")

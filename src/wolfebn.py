@@ -12,6 +12,13 @@ def main():
 
 
 main()
-    color = 'blue'
+
     robot = rb.Snatch3rRobot()
-    robot.ArmAndClaw.calibrate()
+
+
+def make_polygon(self, sides, scale):
+    deg = 360/sides
+    for k in range(sides):
+        robot.move_forward_inches(scale)
+        robot.turn_in_place(deg)
+
