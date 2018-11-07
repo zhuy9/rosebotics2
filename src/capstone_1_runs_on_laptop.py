@@ -5,10 +5,10 @@ Mini-application:  Buttons on a Tkinter GUI tell the robot to:
 This module runs on your LAPTOP.
 It uses MQTT to SEND information to a program running on the ROBOT.
 
-Authors:  David Mutchler, his colleagues, and PUT_YOUR_NAME_HERE.
+Authors:  David Mutchler, his colleagues, and Bryan Wolfe.
 """
 # ------------------------------------------------------------------------------
-# TODO: 1. PUT YOUR NAME IN THE ABOVE LINE.  Then delete this TODO.
+# Done: 1. PUT YOUR NAME IN THE ABOVE LINE.  Then delete this Done.
 # ------------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------------
