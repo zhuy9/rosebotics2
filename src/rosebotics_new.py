@@ -719,7 +719,7 @@ class ArmAndClaw(object):
         # At the DOWN position, the robot fits in its plastic bin,
         # so we start with the ArmAndClaw in that position.
         self.position = 0
-        self.calibrate()
+        # self.calibrate()
 
     def calibrate(self):
         """
