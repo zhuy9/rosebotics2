@@ -732,7 +732,7 @@ class ArmAndClaw(object):
         self.motor.start_spinning(-100)
         while True:
             if self.motor.get_degrees_spun() >= 14.2 * 360:
-                self.motor.stop_moving()
+                self.motor.stop_spinning()
                 break
         self.position = 0
         # Done: Do this as STEP 2 of implementing this class.
@@ -746,7 +746,7 @@ class ArmAndClaw(object):
         """
         self.motor.start_spinning(100)
         self.touch_sensor.wait_until_pressed()
-        self.motor.stop_action()
+        self.motor.stop_spinning()
 
         # Done: Do this as STEP 1 of implementing this class.
 
@@ -759,7 +759,7 @@ class ArmAndClaw(object):
         self.motor.start_spinning(-100)
         while True:
             if self.motor.get_degrees_spun() >= deg:
-                self.motor.stop_moving()
+                self.motor.stop_spinning()
                 break
 
         # Done: Do this as STEP 3 of implementing this class.
