@@ -9,16 +9,22 @@ import time
 
 def main():
     """ Runs YOUR specific part of the project """
+    robot = rb.Snatch3rRobot()
+    """
+    Stores the robot.
+    :type robot: rb.Snatch3rRobot
+    """
+def apptest(inches, deg, deg2):
+
+    robot.go_straight_inches(inches)
+    time.sleep(3)
+    robot.spin_in_place_degrees(deg)
+    time.sleep(3)
+    robot.turn_degrees(deg2)
+    time.sleep(3)
+    robot.ArmAndClaw.calibrate
+
 
 
 main()
-
-    robot = rb.Snatch3rRobot()
-
-
-def make_polygon(self, sides, scale):
-    deg = 360/sides
-    for k in range(sides):
-        robot.move_forward_inches(scale)
-        robot.turn_in_place(deg)
-
+apptest(8, 360, 90)
