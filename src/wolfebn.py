@@ -10,18 +10,18 @@ import time
 def main():
     """ Runs YOUR specific part of the project """
     robot = rb.Snatch3rRobot()
-    apptest(robot, 8, 360, 90)
+    apptest(robot)
 
 
-def apptest(robot, inches, deg, deg2):
+def apptest(robot):
 
-    robot.drive_system.go_straight_inches(inches)
+    robot.drive_system.go_straight_inches(8)
     robot.drive_system.stop_moving()
     time.sleep(1)
-    robot.drive_system.spin_in_place_degrees(deg)
+    robot.drive_system.spin_in_place_degrees(360)
     robot.drive_system.stop_moving()
     time.sleep(1)
-    robot.drive_system.turn_degrees(deg2)
+    robot.drive_system.turn_degrees(90)
     robot.drive_system.stop_moving()
     time.sleep(1)
     robot.arm.calibrate()
