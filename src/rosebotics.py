@@ -209,7 +209,7 @@ class ArmAndClaw(object):
     def __init__(self, touch_sensor, port=ev3.OUTPUT_A):
         # The ArmAndClaw's  motor  is not really a Wheel, of course,
         # but it can do exactly what a Wheel can do.
-        self.motor = low_level_rb.Wheel(port, is_arm=True)
+        self.motor = rb.Wheel(port, is_arm=True)
 
         # The ArmAndClaw "has" the TouchSensor that is at the back of the Arm.
         self.touch_sensor = touch_sensor
