@@ -19,8 +19,10 @@ def apptest(robot, inches, deg, deg2):
     robot.drive_system.stop_moving()
     time.sleep(1)
     robot.drive_system.spin_in_place_degrees(deg)
+    robot.drive_system.stop_moving()
     time.sleep(1)
     robot.drive_system.turn_degrees(deg2)
+    robot.drive_system.stop_moving()
     time.sleep(1)
     robot.arm.calibrate()
 
