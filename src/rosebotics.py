@@ -163,39 +163,105 @@ class DriveSystem(object):
                 break
 
 
-class ArmAndClaw(object):
-    def __init__(self, touch_sensor, port=ev3.OUTPUT_A):
-        self.motor = ev3.MediumMotor(port)
-        self.touch_sensor = touch_sensor
-        self.calibrate()  # Sets the motor's position to 0 at the DOWN position.
+# class ArmAndClaw(object):
+#     def __init__(self, touch_sensor, port=ev3.OUTPUT_A):
+#         self.motor = ev3.MediumMotor(port)
+#         self.touch_sensor = touch_sensor
+#         self.calibrate()  # Sets the motor's position to 0 at the DOWN position.
+#
+#
+#     def calibrate(self):
+#         """
+#         Raise the arm to until the touch sensor is pressed.
+#         Then lower the arm XXX units.
+#         Set the motor's position to 0 at that point.
+#         (Hence, 0 means all the way DOWN and XXX means all the way UP).
+#         """
+#         # TODO
+#
+#     def raise_arm_and_close_claw(self):
+#         """
+#         Raise the arm (and hence close the claw).
+#         Stop when the touch sensor is pressed.
+#         """
+#         # TODO
+#
+#     def lower_arm_and_open_claw(self):
+#         """
+#         Raise the arm (and hence close the claw).
+#         Stop when the touch sensor is pressed.
+#         """
+#         # TODO
+#
+#     def move_arm_to_position(self, position):
+#         """ Spin the arm's motor until it reaches the given position. """
+#         # TODO
 
+class ArmAndClaw(object):
+    """
+    A class for the arm and its associated claw.
+    Primary authors:  The ev3dev authors, David Mutchler, Dave Fisher,
+    their colleagues, the entire team, and Bryan Wolfe.
+    """
+    # Done: In the above line, put the name of the primary author of this class.
+
+    def __init__(self, touch_sensor, port=ev3.OUTPUT_A):
+        # The ArmAndClaw's  motor  is not really a Wheel, of course,
+        # but it can do exactly what a Wheel can do.
+        self.motor = low_level_rb.Wheel(port, is_arm=True)
+
+        # The ArmAndClaw "has" the TouchSensor that is at the back of the Arm.
+        self.touch_sensor = touch_sensor
+
+        # Sets the motor's position to 0 (the DOWN position).
+        # At the DOWN position, the robot fits in its plastic bin,
+        # so we start with the ArmAndClaw in that position.
+        self.position = 0
+        self.calibrate()
 
     def calibrate(self):
         """
-        Raise the arm to until the touch sensor is pressed.
-        Then lower the arm XXX units.
-        Set the motor's position to 0 at that point.
-        (Hence, 0 means all the way DOWN and XXX means all the way UP).
+        Raise the arm at a reasonable speed until the touch sensor is pressed.
+        Then lower the arm 14.2 revolutions (i.e., 14.2 * 360 degrees),
+        again at a reasonable speed. Then set the motor's position to 0.
+        (Hence, 0 means all the way DOWN and 14.2 * 360 means all the way UP).
         """
-        # TODO
+        self.raise_arm_and_close_claw()
+        self.motor.start_spinning(-100)
+        while True:
+            if self.motor.get_degrees_spun() >= 14.2 * 360:
+                self.motor.stop_spinning()
+                break
+        self.position = 0
+        # Done: Do this as STEP 2 of implementing this class.
 
     def raise_arm_and_close_claw(self):
         """
-        Raise the arm (and hence close the claw).
+        Raise the arm (and hence close the claw), by making this ArmAndClaw
+        object's motor start spinning at a reasonable speed (e.g. 100).
+        Positive speeds make the arm go UP; negative speeds make it go DOWN.
         Stop when the touch sensor is pressed.
         """
-        # TODO
+        self.motor.start_spinning(100)
+        self.touch_sensor.wait_until_pressed()
+        self.motor.stop_spinning()
 
-    def lower_arm_and_open_claw(self):
-        """
-        Raise the arm (and hence close the claw).
-        Stop when the touch sensor is pressed.
-        """
-        # TODO
+        # Done: Do this as STEP 1 of implementing this class.
 
     def move_arm_to_position(self, position):
-        """ Spin the arm's motor until it reaches the given position. """
-        # TODO
+        """
+        Spin the arm's motor until it reaches the given position.
+        Move at a reasonable speed.
+        """
+        deg = position - self.position
+        self.motor.start_spinning(-100)
+        while True:
+            if self.motor.get_degrees_spun() >= deg:
+                self.motor.stop_spinning()
+                break
+
+        # Done: Do this as STEP 3 of implementing this class.
+
 
 
 class TouchSensor(rb.TouchSensor):
