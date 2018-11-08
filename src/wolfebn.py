@@ -14,6 +14,8 @@ def main():
     Stores the robot.
     :type robot: rb.Snatch3rRobot
     """
+    apptest(8, 360, 90)
+
 def apptest(inches, deg, deg2):
 
     robot.go_straight_inches(inches)
@@ -27,4 +29,3 @@ def apptest(inches, deg, deg2):
 
 
 main()
-apptest(8, 360, 90)
