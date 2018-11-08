@@ -33,9 +33,19 @@ def main():
     print('move forward until see black:')
     # until_color_is(1)
     # time.sleep(5)
-
     print('----end of sprint one------')
 
+    print('------SPRINT TWO---------')
+    print('TEST ARM HERE')  # OK
+    # test_arm()
+    # time.sleep(5)
+    print('TEST IR HERE')
+    # beep_when_wave_hands()
+    # time.sleep(5)
+    print('TEST CAMERA HERE')
+    # beep_if_bigger_than_1000()
+    # time.sleep(5)
+    print('----end of sprint two------')
 
 
 
@@ -225,7 +235,58 @@ def run_test_turn_neg_degrees():
     time.sleep(5)
 
 
+################ SPRINT TWO ##################
+def beep_when_wave_hands():
+    robot = rb.Snatch3rRobot()
+    print('test ir sensor, exit by press the button or ctrl + c')
+    print('ir sensor as proximity sensor')
+    print('the robot will beep when the object is within [9, 15] inches')
+    while True:
+        if robot.proximity_sensor.get_distance_to_nearest_object_in_inches() <= 15:
+            print(robot.proximity_sensor.get_distance_to_nearest_object_in_inches())
+            ev3.Sound.beep().wait(0.1)
+        if robot.touch_sensor.is_pressed() is True:
+            break
 
+
+def beep_if_bigger_than_1000():
+    robot = rb.Snatch3rRobot()
+    print('test the camera, exit by press the button or ctrl + c')
+    print('the robot will beep and speak if the blob is bigger than 1000 pixels')
+
+    while True:
+        print("current area: ", robot.camera.get_biggest_blob().get_area())
+        # robot.camera.get_biggest_blob()
+        if robot.camera.get_biggest_blob().get_area() >= 1000:
+            ev3.Sound.beep().wait(0.1)
+            ev3.Sound.speak("object on sight").wait(0.1)
+            print("The area is", robot.camera.get_biggest_blob().get_area())
+            break
+        if robot.touch_sensor.is_pressed() is True:
+            break
+            # two ways to exit
+
+
+def test_arm():
+    robot = rb.Snatch3rRobot()
+    print("initial degree: ", robot.arm.motor.get_degrees_spun())
+    print('start calibration.......')
+    print('start calibration.....')
+    print('start calibration...')
+    print('exit by ctrl + c ')
+    robot.arm.calibrate()
+    print("Motor degree is now at", robot.arm.motor.get_degrees_spun(), "which is the lowest point")
+    time.sleep(1)
+
+    print('moving to the highest point, transporting something')
+    robot.arm.move_arm_to_position(1000)
+    time.sleep(1)
+
+    print('moving to the lowest point, releasing something')
+    robot.arm.move_arm_to_position(-5120)
+
+    print('---test ended----')
+    print('exit by ctrl + c ')
 
 
 main()
