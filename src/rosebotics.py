@@ -49,7 +49,7 @@ class Snatch3rRobot(object):
         # self.camera = Camera(camera_port)
         self.color_sensor = ColorSensor(color_sensor_port)
         # self.infrared_sensor = InfraredSensor(infrared_sensor_port)
-        
+
 
 
 class DriveSystem(object):
@@ -185,7 +185,7 @@ class DriveSystem(object):
 #         Raise the arm (and hence close the claw).
 #         Stop when the touch sensor is pressed.
 #         """
-#         # TODO
+#         # TODO 
 #
 #     def lower_arm_and_open_claw(self):
 #         """
