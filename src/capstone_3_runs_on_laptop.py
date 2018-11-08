@@ -1,11 +1,9 @@
 """
 Mini-application:  Buttons on a Tkinter GUI tell the robot to:
   - Go forward at the speed given in an entry box.
-
 This module runs on your LAPTOP.
 It uses MQTT to SEND information to a program running on the ROBOT.
-
-Authors:  David Mutchler, his colleagues, and PUT_YOUR_NAME_HERE.
+Authors:  David Mutchler, his colleagues, and Yuchen Zhu
 """
 # ------------------------------------------------------------------------------
 # TODO: 1. PUT YOUR NAME IN THE ABOVE LINE.  Then delete this TODO.
@@ -32,7 +30,7 @@ Authors:  David Mutchler, his colleagues, and PUT_YOUR_NAME_HERE.
 
 # ------------------------------------------------------------------------------
 # TODO: 3. One team member: change the following in mqtt_remote_method_calls.py:
-#                LEGO_NUMBER = 99
+#                LEGO_NUMBER = 10
 # TODO:    to use YOUR robot's number instead of 99.
 # TODO:    Commit and push the change, then other team members Update Project.
 # TODO:    Then delete this TODO.
@@ -52,17 +50,18 @@ import mqtt_remote_method_calls as com
 def main():
     """ Constructs and runs a GUI for this program. """
     root = tkinter.Tk()
-    setup_gui(root)
+    # construct com.MqttClient clint && make it connect to ev3
+
+    client = com.MqttClient()
+    client.connect_to_ev3()
+
+    setup_gui(root, client)
+
 
     root.mainloop()
-    # --------------------------------------------------------------------------
-    # TODO: 5. Add code above that constructs a   com.MqttClient   that will
-    # TODO:    be used to send commands to the robot.  Connect it to this pc.
-    # TODO:    Test.  When OK, delete this TODO.
-    # --------------------------------------------------------------------------
 
 
-def setup_gui(root_window):
+def setup_gui(root_window, client):
     """ Constructs and sets up widgets on the given window. """
     frame = ttk.Frame(root_window, padding=10)
     frame.grid()
@@ -74,10 +73,10 @@ def setup_gui(root_window):
     go_forward_button.grid()
 
     go_forward_button['command'] = \
-        lambda: handle_go_forward()
+        lambda: handle_go_forward(speed_entry_box, client)
 
 
-def handle_go_forward():
+def handle_go_forward(entry_box, mqtt_client):
     """
     Tells the robot to go forward at the speed specified in the given entry box.
     """
@@ -94,7 +93,9 @@ def handle_go_forward():
     # TODO:    necessary for that object to make its way to this function.
     # TODO:    When done, delete this TODO.
     # --------------------------------------------------------------------------
-
+    speed_string = entry_box.get()
+    print("sending the go_forward message with speed : ", speed_string)
+    mqtt_client.send_message('go_forward', [speed_string])
     # --------------------------------------------------------------------------
     # TODO: 8. Add the single line of code needed to get the string that is
     # TODO:    currently in the entry box.
