@@ -15,11 +15,11 @@ def main():
 def apptest(robot, inches, deg, deg2):
 
     robot.drive_system.go_straight_inches(inches)
-    time.sleep(3)
+    time.sleep(1)
     robot.drive_system.spin_in_place_degrees(deg)
-    time.sleep(3)
+    time.sleep(1)
     robot.drive_system.turn_degrees(deg2)
-    time.sleep(3)
+    time.sleep(1)
     robot.ArmAndClaw.calibrate()
 
 
