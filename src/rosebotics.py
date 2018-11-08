@@ -49,6 +49,7 @@ class Snatch3rRobot(object):
         # self.camera = Camera(camera_port)
         self.color_sensor = ColorSensor(color_sensor_port)
         # self.infrared_sensor = InfraredSensor(infrared_sensor_port)
+        self.arm = ArmAndClaw(self.touch_sensor, arm_port)
 
 
 class DriveSystem(object):

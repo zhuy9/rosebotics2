@@ -24,7 +24,7 @@ def apptest():
     robot.drive_system.turn_degrees(90)
     robot.drive_system.stop_moving()
     time.sleep(1)
-    robot.ArmAndClaw.calibrate()
+    robot.arm.calibrate()
 
 
 
