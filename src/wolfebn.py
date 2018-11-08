@@ -24,7 +24,7 @@ def apptest(inches, deg, deg2):
     time.sleep(3)
     robot.turn_degrees(deg2)
     time.sleep(3)
-    robot.ArmAndClaw.calibrate
+    robot.ArmAndClaw.calibrate()
 
 
 
