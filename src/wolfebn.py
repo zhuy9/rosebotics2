@@ -14,9 +14,9 @@ def main():
     Stores the robot.
     :type robot: rb.Snatch3rRobot
     """
-    apptest(8, 360, 90)
+    apptest(robot, 8, 360, 90)
 
-def apptest(inches, deg, deg2):
+def apptest(robot, inches, deg, deg2):
 
     robot.go_straight_inches(inches)
     time.sleep(3)
