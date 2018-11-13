@@ -63,6 +63,7 @@ def main():
 class RemoteControlEtc(object):
     def __init__(self, robot):
         self.robot = robot
+        self.travel = 0 #Robot's Travel Distance
         """
         Stores the robot.
         :type robot: rb.Snatch3rRobot
@@ -73,6 +74,44 @@ class RemoteControlEtc(object):
         print("Telling the robot to start moving at", speed_string)
         speed = int(speed_string)
         self.robot.drive_system.start_moving(speed, speed)
+
+    def get_distance(self):
+        dist = self.robot.proximity_sensor.get_distance_to_nearest_object()
+        print(dist, 'cm away from sensor')
+
+    def raise_arm(self):
+        self.robot.arm.raise_arm_and_close_claw()
+        print('Raising Arm')
+
+    def lower_arm(self):
+        self.robot.arm.motor.start_spinning(-100)
+        self.robot.arm.motor.reset_degrees_spun()
+        while True:
+            if self.robot.arm.motor.get_degrees_spun() <= 14.2 * -360:
+                self.robot.arm.motor.stop_spinning()
+                break
+        print('Lowering Arm')
+
+    def reverse(self):
+        self.robot.drive_system.spin_in_place_degrees(180)
+        print("Reversing Direction")
+
+    def travel_to_target(self):
+        while True:
+            self.robot.drive_system.start_moving(30, 30)
+            if self.robot.proximity_sensor.get_distance_to_nearest_object() <= 3:
+                self.robot.drive_system.stop_moving()
+                travel = self.robot.drive_system.left_wheel.get_degrees_spun() * 86
+                self.travel = travel
+
+    def fetch(self):
+        self.travel_to_target()
+        self.raise_arm()
+        self.reverse()
+        self.robot.drive_system.go_straight_inches(self.travel)
+        self.lower_arm()
+        self.robot.drive_system.go_straight_inches(-5)
+        self.reverse()
 
 
 main()

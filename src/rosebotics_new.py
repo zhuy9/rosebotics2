@@ -175,8 +175,8 @@ class DriveSystem(object):
         """
         STOPS the robot, using the given StopAction (which defaults to BRAKE).
         """
-        self.left_wheel.stop_spinning(stop_action)
-        self.right_wheel.stop_spinning(stop_action)
+        self.left_wheel.stop_spinning()
+        self.right_wheel.stop_spinning()
 
     def move_for_seconds(self,
                          seconds,
@@ -210,7 +210,7 @@ class DriveSystem(object):
                           duty_cycle_percent)
         while True:
             if fabs(self.left_wheel.get_degrees_spun()) >= 86 * inches:
-                self.stop_moving(stop_action)
+                self.stop_moving()
                 self.left_wheel.reset_degrees_spun()
                 self.right_wheel.reset_degrees_spun()
                 break
@@ -242,7 +242,7 @@ class DriveSystem(object):
                           -duty_cycle_percent)
         while True:
             if fabs(self.left_wheel.get_degrees_spun()) >= 5.7 * degrees:
-                self.stop_moving(stop_action)
+                self.stop_moving()
                 self.left_wheel.reset_degrees_spun()
                 self.right_wheel.reset_degrees_spun()
                 break
@@ -270,7 +270,7 @@ class DriveSystem(object):
 
         while True:
             if fabs(self.left_wheel.get_degrees_spun()) >= 954 // 90 * degrees:
-                self.stop_moving(stop_action)
+                self.stop_moving()
                 self.left_wheel.reset_degrees_spun()
                 self.right_wheel.reset_degrees_spun()
                 break
@@ -730,11 +730,14 @@ class ArmAndClaw(object):
         """
         self.raise_arm_and_close_claw()
         self.motor.start_spinning(-100)
+        self.motor.reset_degrees_spun()
         while True:
-            if self.motor.get_degrees_spun() >= 14.2 * 360:
+            if self.motor.get_degrees_spun() <= 14.2 * -360:
                 self.motor.stop_spinning()
+                self.position = 0
                 break
-        self.position = 0
+
+
         # Done: Do this as STEP 2 of implementing this class.
 
     def raise_arm_and_close_claw(self):

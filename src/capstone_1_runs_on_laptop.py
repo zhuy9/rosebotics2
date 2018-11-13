@@ -73,12 +73,32 @@ def setup_gui(root_window, client):
 
     speed_entry_box = ttk.Entry(frame)
     go_forward_button = ttk.Button(frame, text="Go forward")
+    get_distance_button = ttk.Button(frame, text="Get distance")
+    lower_arm_button = ttk.Button(frame, text="Lower Arm")
+    raise_arm_button = ttk.Button(frame, text="Raise Arm")
+    reverse_button = ttk.Button(frame, text="Turn Around")
+    fetch_button = ttk.Button(frame, text="Fetch")
 
     speed_entry_box.grid()
     go_forward_button.grid()
-
+    get_distance_button.grid()
+    lower_arm_button.grid()
+    raise_arm_button.grid()
+    reverse_button.grid()
+    fetch_button.grid()
     go_forward_button['command'] = \
         lambda: handle_go_forward(speed_entry_box, client)
+    get_distance_button['command'] = \
+        lambda: handle_get_distance(client)
+    lower_arm_button['command'] = \
+        lambda: handle_lower_arm(client)
+    raise_arm_button['command'] = \
+        lambda: handle_raise_arm(client)
+    reverse_button['command'] = \
+        lambda: handle_reverse(client)
+    fetch_button['command'] = \
+        lambda: handle_fetch(client)
+
 
 
 def handle_go_forward(entry_box, client):
@@ -115,6 +135,25 @@ def handle_go_forward(entry_box, client):
     # TODO:
     # TODO:    Test by using a PRINT statement.  When done, delete this TODO.
     # --------------------------------------------------------------------------
+def handle_get_distance(client):
+    client.send_message('get_distance')
+    print('Getting distance')
+
+def handle_raise_arm(client):
+    client.send_message('raise_arm')
+    print('Raising Arm')
+
+def handle_lower_arm(client):
+    client.send_message('lower_arm')
+    print('Lowering Arm')
+
+def handle_reverse(client):
+    client.send_message('reverse')
+    print('Sending Reverse')
+
+def handle_fetch(client):
+    client.send_message('fetch')
+    print('Fetching Item')
 
 
 main()
