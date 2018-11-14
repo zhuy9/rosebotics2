@@ -63,7 +63,7 @@ def main():
 class RemoteControlEtc(object):
     def __init__(self, robot):
         self.robot = robot
-        self.travel = 0 #Robot's Travel Distance
+        self.T = 0 #Robot's Travel Time
         """
         Stores the robot.
         :type robot: rb.Snatch3rRobot
@@ -93,25 +93,60 @@ class RemoteControlEtc(object):
         print('Lowering Arm')
 
     def reverse(self):
-        self.robot.drive_system.spin_in_place_degrees(180)
+       # self.robot.drive_system.spin_in_place_degrees(180)
+        self.robot.drive_system.left_wheel.start_spinning(40)
+        self.robot.drive_system.right_wheel.start_spinning(-40)
+        time.sleep(4)
+        self.robot.drive_system.left_wheel.start_spinning(0)
+        self.robot.drive_system.right_wheel.start_spinning(0)
         print("Reversing Direction")
 
+
     def travel_to_target(self):
+        t = time.time()
+        self.robot.drive_system.start_moving(30, 30)
         while True:
-            self.robot.drive_system.start_moving(30, 30)
+            #print(self.robot.proximity_sensor.get_distance_to_nearest_object())
             if self.robot.proximity_sensor.get_distance_to_nearest_object() <= 3:
                 self.robot.drive_system.stop_moving()
-                travel = self.robot.drive_system.left_wheel.get_degrees_spun() * 86
-                self.travel = travel
+                T = time.time() - t
+                self.T = T
+                break
 
-    def fetch(self):
+    def stop(self):
+        self.robot.drive_system.stop_moving()
+
+    def go_home(self):
+        self.robot.drive_system.left_wheel.start_spinning(40)
+        self.robot.drive_system.right_wheel.start_spinning(40)
+        time.sleep(self.T)
+        self.robot.drive_system.left_wheel.start_spinning(0)
+        self.robot.drive_system.right_wheel.start_spinning(0)
+
+    def back_up(self):
+        self.robot.drive_system.left_wheel.start_spinning(-40)
+        self.robot.drive_system.right_wheel.start_spinning(-40)
+        time.sleep(2)
+        self.robot.drive_system.left_wheel.start_spinning(0)
+        self.robot.drive_system.right_wheel.start_spinning(0)
+
+    def fetch(self, client):
         self.travel_to_target()
+        time.sleep(0.2)
         self.raise_arm()
+        time.sleep(0.2)
         self.reverse()
-        self.robot.drive_system.go_straight_inches(self.travel)
+        time.sleep(0.2)
+        self.go_home()
+        time.sleep(0.2)
         self.lower_arm()
-        self.robot.drive_system.go_straight_inches(-5)
+        time.sleep(0.2)
+        self.back_up()
+        time.sleep(0.2)
         self.reverse()
+        override(client, 'Item Delivered')
 
+def override(client, string):
+    client.send_message('override', [string])
 
 main()

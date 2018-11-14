@@ -52,11 +52,11 @@ import mqtt_remote_method_calls as com
 def main():
     """ Constructs and runs a GUI for this program. """
     root = tkinter.Tk()
-
+    laptop = Laptop()
     client = com.MqttClient()
     client.connect_to_ev3()
 
-    setup_gui(root, client)
+    setup_gui(root, client, laptop)
 
     root.mainloop()
     # --------------------------------------------------------------------------
@@ -66,7 +66,16 @@ def main():
     # --------------------------------------------------------------------------
 
 
-def setup_gui(root_window, client):
+class Laptop(object):
+
+    def __init__(self):
+        self.label = 'hello'
+
+    def override(self, new_label):
+        self.label = new_label
+
+
+def setup_gui(root_window, client, laptop):
     """ Constructs and sets up widgets on the given window. """
     frame = ttk.Frame(root_window, padding=10)
     frame.grid()
@@ -77,7 +86,11 @@ def setup_gui(root_window, client):
     lower_arm_button = ttk.Button(frame, text="Lower Arm")
     raise_arm_button = ttk.Button(frame, text="Raise Arm")
     reverse_button = ttk.Button(frame, text="Turn Around")
+    stop_button = ttk.Button(frame, text="Stop")
     fetch_button = ttk.Button(frame, text="Fetch")
+    label_1 = ttk.Label(frame, text="Hello")
+    #label_1['text'] = 'Goodbye'
+    label_1['text'] = laptop.label
 
     speed_entry_box.grid()
     go_forward_button.grid()
@@ -85,7 +98,10 @@ def setup_gui(root_window, client):
     lower_arm_button.grid()
     raise_arm_button.grid()
     reverse_button.grid()
+    stop_button.grid()
     fetch_button.grid()
+    label_1.grid()
+
     go_forward_button['command'] = \
         lambda: handle_go_forward(speed_entry_box, client)
     get_distance_button['command'] = \
@@ -96,6 +112,8 @@ def setup_gui(root_window, client):
         lambda: handle_raise_arm(client)
     reverse_button['command'] = \
         lambda: handle_reverse(client)
+    stop_button['command'] = \
+        lambda: handle_stop(client)
     fetch_button['command'] = \
         lambda: handle_fetch(client)
 
@@ -151,9 +169,19 @@ def handle_reverse(client):
     client.send_message('reverse')
     print('Sending Reverse')
 
+def handle_stop(client):
+    client.send_message('stop')
+    print('Stop')
+
 def handle_fetch(client):
-    client.send_message('fetch')
+    client.send_message('fetch', ['client'])
     print('Fetching Item')
+
+def override(string):
+    Laptop.override(string)
+
+
+
 
 
 main()
