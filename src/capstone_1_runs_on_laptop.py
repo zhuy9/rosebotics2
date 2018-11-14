@@ -53,7 +53,7 @@ def main():
     """ Constructs and runs a GUI for this program. """
     root = tkinter.Tk()
     laptop = Laptop()
-    client = com.MqttClient()
+    client = com.MqttClient(laptop)
     client.connect_to_ev3()
 
     setup_gui(root, client, laptop)
@@ -71,9 +71,9 @@ class Laptop(object):
     def __init__(self):
         self.label = 'hello'
 
-    def override(self, new_label):
-        self.label = new_label
-
+    def override(self, new_label_string):
+        self.label['text'] = new_label_string
+        print(new_label_string)
 
 def setup_gui(root_window, client, laptop):
     """ Constructs and sets up widgets on the given window. """
@@ -90,8 +90,8 @@ def setup_gui(root_window, client, laptop):
     fetch_button = ttk.Button(frame, text="Fetch")
     label_1 = ttk.Label(frame, text="Hello")
     #label_1['text'] = 'Goodbye'
-    label_1['text'] = laptop.label
-
+    #label_1['text'] = laptop.label
+    laptop.label = label_1
     speed_entry_box.grid()
     go_forward_button.grid()
     get_distance_button.grid()
@@ -174,11 +174,11 @@ def handle_stop(client):
     print('Stop')
 
 def handle_fetch(client):
-    client.send_message('fetch', ['client'])
+    client.send_message('fetch')
     print('Fetching Item')
 
-def override(string):
-    Laptop.override(string)
+#def override(string):
+ #   Laptop.override(string)
 
 
 

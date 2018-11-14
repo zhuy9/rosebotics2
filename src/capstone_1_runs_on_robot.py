@@ -38,6 +38,7 @@ def main():
     rc = RemoteControlEtc(robot)
     client = com.MqttClient(rc)
     client.connect_to_pc()
+    rc.client = client
     # --------------------------------------------------------------------------
     # TODO: 5. Add a class for your "delegate" object that will handle messages
     # TODO:    sent from the laptop.  Construct an instance of the class and
@@ -64,6 +65,7 @@ class RemoteControlEtc(object):
     def __init__(self, robot):
         self.robot = robot
         self.T = 0 #Robot's Travel Time
+        self.client = None
         """
         Stores the robot.
         :type robot: rb.Snatch3rRobot
@@ -130,7 +132,7 @@ class RemoteControlEtc(object):
         self.robot.drive_system.left_wheel.start_spinning(0)
         self.robot.drive_system.right_wheel.start_spinning(0)
 
-    def fetch(self, client):
+    def fetch(self):
         self.travel_to_target()
         time.sleep(0.2)
         self.raise_arm()
@@ -144,7 +146,7 @@ class RemoteControlEtc(object):
         self.back_up()
         time.sleep(0.2)
         self.reverse()
-        override(client, 'Item Delivered')
+        override(self.client, 'Item Delivered')
 
 def override(client, string):
     client.send_message('override', [string])
